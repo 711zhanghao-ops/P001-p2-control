@@ -1,0 +1,5 @@
+P001 P2 minimal handoff
+purpose: verify Git CLI upload, remote read, SHA-256 check, status receipt, and revision flow
+state: READY
+version: 1
+note: no token, no formal P001 object
