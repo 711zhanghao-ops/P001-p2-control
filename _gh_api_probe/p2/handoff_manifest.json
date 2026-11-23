@@ -2,13 +2,13 @@
   "packageId": "P001-P2-PUBLIC-20261123",
   "sender": "synthetic fixture",
   "receiver": "controlled receiver",
-  "path": "_gh_api_probe/p2/bidirectional_handoff.txt",
-  "purpose": "P2 F07 public control negative: SHA mismatch",
+  "path": "_gh_api_probe/p2/minimal_handoff.txt",
+  "purpose": "P2 F07 public control negative: manifest path mismatch",
   "transfer": "Git CLI",
   "source": "P001-p2-control handoff branch",
   "version": "1",
   "size": 180,
-  "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "sha256": "FC197ADF3484F1010AD0E9F804C04A16C086883FD7A97E471C9F67E7C5774A09",
   "permissions": "public test fixture",
   "acceptance": "path, size, sha256 and expected text"
 }
