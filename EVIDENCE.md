@@ -48,6 +48,14 @@ Reviewer opinion from the external session is recorded only as:
 SHA tamper receipt: `pathOk=true`, `sizeOk=true`, `shaOk=false`, `textOk=false`.
 Path mismatch receipt: `pathOk=false`, `sizeOk=true`, `shaOk=true`, `textOk=false`.
 
+## Policy v2 maintenance
+
+- Maintenance window: required status check temporarily removed to bootstrap the policy script upgrade; restored immediately after merge.
+- Policy enhancement commit: `c67f72d` (PR #5).
+- Post-maintenance main: `3e10408ea949698676c914c4571b9ce57fd2a182`.
+- New policy checks: isolated behavioral suite (positive, blank text, missing text, non-fixed path, SHA mismatch, path mismatch, text mismatch) plus a string-preserving bypass self-test.
+- Verification PR: this EVIDENCE update (required `verify-control-pr` must pass before merge).
+
 ## Boundary
 
 No formal P001 repository, production code, production data, production pointer or frozen copy was modified. P4 remains NOT AUTHORIZED. P2 acceptance covers the protocol only.
