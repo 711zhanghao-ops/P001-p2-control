@@ -22,13 +22,21 @@ def safe_rel(path):
     return True
 
 
+FIXED_EXPECTED_PATH = '_gh_api_probe/p2/bidirectional_handoff.txt'
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--root', required=True)
     ap.add_argument('--expected-path', required=True)
-    ap.add_argument('--expected-text', default='')
+    ap.add_argument('--expected-text', required=True)
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
+
+    if args.expected_path != FIXED_EXPECTED_PATH:
+        fail('expected_path must equal the fixed control path')
+    if not args.expected_text.strip():
+        fail('expected_text must be non-empty')
 
     manifest_rel = '_gh_api_probe/p2/handoff_manifest.json'
     manifest_path = os.path.join(args.root, manifest_rel)
@@ -38,7 +46,7 @@ def main():
         fail(f'manifest parse failed: {exc}')
 
     declared = str(manifest.get('path', ''))
-    expected = args.expected_path
+    expected = FIXED_EXPECTED_PATH
     path_ok = declared == expected and safe_rel(declared)
     file_path = os.path.join(args.root, expected) if safe_rel(expected) else ''
     file_exists = bool(file_path) and os.path.isfile(file_path)
@@ -70,7 +78,7 @@ def main():
         states.append({'state': 'REVIEWED', 'by': identity, 'at': now, 'evidence': f'expected text found: {args.expected_text}'})
         states.append({'state': 'ACCEPTED', 'by': identity, 'at': now, 'evidence': 'controlled receiver acceptance'})
 
-    accepted = verified and (text_ok or not args.expected_text)
+    accepted = verified and text_ok
     receipt = {
         'receiptSchemaVersion': 'P2-RECEIPT-v1.0',
         'role': 'receiver',

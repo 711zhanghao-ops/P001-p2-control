@@ -7,15 +7,6 @@ on:
         description: Exact handoff commit SHA in this repository
         required: true
         type: string
-      expected_path:
-        description: Fixed expected handoff path
-        required: true
-        type: string
-      expected_text:
-        description: Expected content marker
-        required: false
-        default: P001 P2 minimal handoff
-        type: string
 
 permissions:
   contents: read
@@ -24,6 +15,9 @@ permissions:
 jobs:
   receive:
     runs-on: ubuntu-latest
+    env:
+      EXPECTED_PATH: _gh_api_probe/p2/bidirectional_handoff.txt
+      EXPECTED_TEXT: P001 P2 minimal handoff
     steps:
       - name: Checkout protected control branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -47,8 +41,6 @@ jobs:
       - name: Verify independently
         shell: bash
         env:
-          EXPECTED_PATH: ${{ inputs.expected_path }}
-          EXPECTED_TEXT: ${{ inputs.expected_text }}
           HANDOFF_BRANCH: handoff
           HANDOFF_SHA: ${{ inputs.handoff_sha }}
         run: |
