@@ -1,0 +1,63 @@
+name: P2 controlled receiver
+
+on:
+  workflow_dispatch:
+    inputs:
+      handoff_sha:
+        description: Exact handoff commit SHA in this repository
+        required: true
+        type: string
+      expected_path:
+        description: Fixed expected handoff path
+        required: true
+        type: string
+      expected_text:
+        description: Expected content marker
+        required: false
+        default: P001 P2 minimal handoff
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  receive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout protected control branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 1
+
+      - name: Checkout handoff at pinned SHA
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          HANDOFF_SHA: ${{ inputs.handoff_sha }}
+        run: |
+          mkdir -p handoff
+          cd handoff
+          git init -q
+          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          AUTH=$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w0)
+          git -c http.extraheader="AUTHORIZATION: basic ${AUTH}" fetch --depth 1 origin "${HANDOFF_SHA}"
+          git checkout -q FETCH_HEAD
+
+      - name: Verify independently
+        shell: bash
+        env:
+          EXPECTED_PATH: ${{ inputs.expected_path }}
+          EXPECTED_TEXT: ${{ inputs.expected_text }}
+          HANDOFF_BRANCH: handoff
+          HANDOFF_SHA: ${{ inputs.handoff_sha }}
+        run: |
+          python3 tools/p2_verify.py --root handoff --expected-path "$EXPECTED_PATH" --expected-text "$EXPECTED_TEXT" --out receipt.json
+
+      - name: Upload receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p2-receiver-receipt-${{ github.run_id }}
+          path: receipt.json
+          if-no-files-found: error
